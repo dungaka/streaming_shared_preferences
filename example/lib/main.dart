@@ -21,12 +21,15 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
+    StreamingSharedPreferences.setPrefsName('test');
     StreamingSharedPreferences.addObserver('temp', (value) {
       print('UPDATEEEEEE');
       setState(() {
         this.value = value;
       });
     });
+
+    StreamingSharedPreferences.run();
 
     Future.doWhile(() async {
       await Future.delayed(Duration(seconds: 1));

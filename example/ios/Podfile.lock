@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - streaming_shared_preferences (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - streaming_shared_preferences (from `.symlinks/plugins/streaming_shared_preferences/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  streaming_shared_preferences:
+    :path: ".symlinks/plugins/streaming_shared_preferences/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  streaming_shared_preferences: 69ffc44e137244d456ecaced2346ab6431246442
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.0.beta.2
