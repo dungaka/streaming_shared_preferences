@@ -41,8 +41,11 @@ class StreamingSharedPreferences {
   }
 
   static void addObserver(String key, ValueObserver observer) {
-    assert(key != null && observer != null);
+    assert(key != null && observer != null && !_isRunning);
     _observers.putIfAbsent(key, () => observer);
+  }
+
+  static void run() {
     if (!_isRunning) {
       _isRunning = true;
       Future.doWhile(() async {
@@ -62,6 +65,7 @@ class StreamingSharedPreferences {
   }
 
   static void removeObservers(String key) {
+    assert(!_isRunning);
     _observers.remove(key);
     if (_observers.length == 0) {
       _isRunning = false;
