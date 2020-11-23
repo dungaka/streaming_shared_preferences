@@ -1,21 +1,26 @@
 package com.topfreelancerdeveloper.streaming_shared_preferences
 
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.annotation.NonNull
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
+
 
 /** StreamingSharedPreferencesPlugin */
-class StreamingSharedPreferencesPlugin: FlutterPlugin, MethodCallHandler {
+class StreamingSharedPreferencesPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
+  private lateinit var activity : Activity;
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "streaming_shared_preferences")
@@ -23,14 +28,39 @@ class StreamingSharedPreferencesPlugin: FlutterPlugin, MethodCallHandler {
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else {
-      result.notImplemented()
+    if (call.method == "getValue") {
+      val key: String? = call.argument("key");
+      val name : String?= call.argument("name");
+      if(name == null)
+      result.success(activity.getPreferences(Context.MODE_PRIVATE).getString(key, null));
+      else
+        result.success(activity.getSharedPreferences(name , Context.MODE_PRIVATE).getString(key, null));
+    }
+    if (call.method == "setValue") {
+      val key: String? = call.argument("key");
+      val value : String?= call.argument("value");
+      val name : String?= call.argument("name");
+      if(name == null)
+      result.success(activity.getPreferences(Context.MODE_PRIVATE).edit().putString(key , value).commit());
+      else result.success(activity.getSharedPreferences(name , Context.MODE_PRIVATE).edit().putString(key , value).commit());
+
     }
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     channel.setMethodCallHandler(null)
+  }
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    this.activity = binding.activity;
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+  }
+
+  override fun onDetachedFromActivity() {
   }
 }
