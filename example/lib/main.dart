@@ -20,21 +20,20 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
-    StreamingSharedPreferences.setPrefsName('test');
-    StreamingSharedPreferences.addObserver('temp', (value) {
+    StreamingSharedPreferences sp = StreamingSharedPreferences();
+    sp.setPrefsName('test');
+    sp.addObserver('temp', (value) {
       print('UPDATEEEEEE');
       setState(() {
         this.value = value;
       });
     });
 
-    StreamingSharedPreferences.run();
+    sp.run();
 
     Future.doWhile(() async {
       await Future.delayed(Duration(seconds: 1));
-      StreamingSharedPreferences.setValue(
-          'temp', Random().nextInt(100).toString());
+      sp.setValue('temp', Random().nextInt(100).toString());
       print('SETTTTTTTTTT');
 
       return true;

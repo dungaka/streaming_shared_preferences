@@ -6,22 +6,22 @@ class StreamingSharedPreferences {
   static const MethodChannel _channel =
       const MethodChannel('streaming_shared_preferences');
 
-  static final Map<String, ValueObserver> _observers = {};
-  static final Map<String, String> _lastValues = {};
-  static Duration _duration = Duration(milliseconds: 250);
-  static bool _isRunning = false;
-  static String _prefsName = null;
-  static void setPrefsName(String name) {
+  final Map<String, ValueObserver> _observers = {};
+  final Map<String, String> _lastValues = {};
+  Duration _duration = Duration(milliseconds: 250);
+  bool _isRunning = false;
+  String _prefsName = null;
+  void setPrefsName(String name) {
     assert(name != null);
     _prefsName = name;
   }
 
-  static void setInterval(Duration duration) {
+  void setInterval(Duration duration) {
     if (_duration == null || _duration.inMilliseconds == 0) return;
     _duration = duration;
   }
 
-  static Future<String> _getLatestValue(String key) {
+  Future<String> _getLatestValue(String key) {
     return _channel.invokeMethod<String>('getValue', {
       'key': key,
       'name': _prefsName,
@@ -31,7 +31,7 @@ class StreamingSharedPreferences {
     });
   }
 
-  static Future<bool> setValue(String key, String value) {
+  Future<bool> setValue(String key, String value) {
     assert(key != null && value != null);
     return _channel.invokeMethod('setValue', {
       'key': key,
@@ -40,12 +40,12 @@ class StreamingSharedPreferences {
     });
   }
 
-  static void addObserver(String key, ValueObserver observer) {
+  void addObserver(String key, ValueObserver observer) {
     assert(key != null && observer != null && !_isRunning);
     _observers.putIfAbsent(key, () => observer);
   }
 
-  static void run() {
+  void run() {
     if (!_isRunning) {
       _isRunning = true;
       Future.doWhile(() async {
@@ -64,7 +64,7 @@ class StreamingSharedPreferences {
     }
   }
 
-  static void removeObservers(String key) {
+  void removeObservers(String key) {
     assert(!_isRunning);
     _observers.remove(key);
     if (_observers.length == 0) {
