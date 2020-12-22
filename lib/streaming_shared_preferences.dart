@@ -8,7 +8,7 @@ class StreamingSharedPreferences {
 
   final Map<String, ValueObserver> _observers = {};
   final Map<String, String> _lastValues = {};
-  Duration _duration = Duration(milliseconds: 250);
+  Duration _duration = Duration(milliseconds: 150);
   bool _isRunning = false;
   String _prefsName = null;
   void setPrefsName(String name) {
@@ -27,7 +27,7 @@ class StreamingSharedPreferences {
       'name': _prefsName,
     }).catchError((err) {
       print(err);
-      return null;
+      return "";
     });
   }
 
@@ -37,7 +37,7 @@ class StreamingSharedPreferences {
       'key': key,
       'value': value,
       'name': _prefsName,
-    });
+    }).catchError((err) => false);
   }
 
   void addObserver(String key, ValueObserver observer) {
@@ -52,10 +52,14 @@ class StreamingSharedPreferences {
         await Future.forEach(
           _observers.keys,
           (element) async {
-            String value = await _getLatestValue(element);
-            if (value == _lastValues[element]) return;
-            _lastValues[element] = value;
-            _observers[element]?.call(value);
+            try {
+              String value = await _getLatestValue(element);
+              if (value == _lastValues[element]) return;
+              _lastValues[element] = value;
+              _observers[element]?.call(value);
+            } catch (err) {
+              print(err);
+            }
           },
         );
         await Future.delayed(_duration);
@@ -65,7 +69,7 @@ class StreamingSharedPreferences {
   }
 
   void removeObservers(String key) {
-    assert(!_isRunning);
+    if (_isRunning) return;
     _observers.remove(key);
     if (_observers.length == 0) {
       _isRunning = false;
