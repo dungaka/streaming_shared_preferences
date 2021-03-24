@@ -21,8 +21,8 @@ class StreamingSharedPreferences {
     _duration = duration;
   }
 
-  Future<String> _getLatestValue(String? key) {
-    return _channel.invokeMethod<String>('getValue', {
+  Future<String?> _getLatestValue(String? key) {
+    return _channel.invokeMethod<String?>('getValue', {
       'key': key,
       'name': _prefsName,
     }).catchError((err) {
@@ -31,9 +31,9 @@ class StreamingSharedPreferences {
     });
   }
 
-  Future<bool> setValue(String? key, String? value) {
+  Future<bool?> setValue(String? key, String? value) {
     assert(key != null && value != null);
-    return _channel.invokeMethod('setValue', {
+    return _channel.invokeMethod<bool?>('setValue', {
       'key': key,
       'value': value,
       'name': _prefsName,
@@ -52,8 +52,8 @@ class StreamingSharedPreferences {
           _observers.keys,
           (element) async {
             try {
-              String value = await _getLatestValue(element as String);
-              if (value == _lastValues[element]) return;
+              String? value = await _getLatestValue(element as String);
+              if (value == null || value == _lastValues[element]) return;
               _lastValues[element] = value;
               _observers[element]?.call(value);
             } catch (err) {
